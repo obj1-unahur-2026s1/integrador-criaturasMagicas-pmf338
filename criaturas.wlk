@@ -85,3 +85,13 @@ class Hada inherits Criatura {
     }
   }
 }
+
+class MascotaMitologica {
+  var edad
+  var tieneCuernos
+
+  method edad() = edad
+  method tieneCuernos() = tieneCuernos
+
+  method esVeterana() = edad >= 10
+}
