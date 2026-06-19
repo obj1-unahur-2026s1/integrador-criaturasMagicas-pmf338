@@ -1,0 +1,114 @@
+import criaturas.*
+import roles.*
+import colonia.*
+import areas.*
+
+
+// Una colonia conquista un área del parque
+
+
+describe "Conquista de un área del parque" {
+
+  const atacante1 = new Duende(poderMagico = 50, astucia = 10, rol = hechicero)
+  const atacante2 = new Duende(poderMagico = 60, astucia = 10, rol = hechicero)
+
+  const coloniaInvasora = new Colonia()
+  const coloniaDefensora = new Colonia()
+
+  const claro = new Claro(colonia = coloniaDefensora)
+
+  method initialize() {
+    coloniaInvasora.criaturas().clear()
+    coloniaDefensora.criaturas().clear()
+    coloniaInvasora.agregarCriatura(atacante1)
+    coloniaInvasora.agregarCriatura(atacante2)
+    claro.asignarColonia(coloniaDefensora)
+  }
+
+  test "la colonia invasora conquista el claro porque su poder ofensivo supera al defensivo" {
+    assert.that(coloniaInvasora.poderOfensivo() > claro.poderDefensivo())
+    coloniaInvasora.intentarConquistar(claro)
+    assert.equals(coloniaInvasora, claro.colonia())
+  }
+}
+
+
+// Ritual: de guardián solo se puede pasar a domador con una mascota nueva de 1 año y sin cuernos
+
+
+describe "Ritual desde el rol guardián" {
+
+  const elfo = new Duende(poderMagico = 40, astucia = 5, rol = guardian)
+  const mascotaNueva = new MascotaMitologica(edad = 1, tieneCuernos = false)
+
+  method initialize() {
+    elfo.mascotas().clear()
+  }
+
+  test "tras el ritual el rol pasa a ser domador" {
+    elfo.cambiarRol(mascotaNueva)
+    assert.equals(domador, elfo.rol())
+  }
+
+  test "tras el ritual la mascota nueva queda registrada en la criatura" {
+    elfo.cambiarRol(mascotaNueva)
+    assert.that(elfo.mascotas().contains(mascotaNueva))
+  }
+
+  test "la mascota nueva tiene 1 año de edad" {
+    elfo.cambiarRol(mascotaNueva)
+    assert.equals(1, mascotaNueva.edad())
+  }
+
+  test "la mascota nueva no tiene cuernos" {
+    elfo.cambiarRol(mascotaNueva)
+    assert.notThat(mascotaNueva.tieneCuernos())
+  }
+}
+
+
+// Poder ofensivo de una criatura con rol Hechicero
+
+
+describe "Poder ofensivo con rol Hechicero" {
+
+  const hada = new Hada(poderMagico = 20, astucia = 30, rol = hechicero)
+
+  test "el poder ofensivo de un hada hechicera es su poder magico por 10 sin extra" {
+    assert.equals(200, hada.poderOfensivo())
+  }
+
+  test "el poder ofensivo de un duende hechicero suma el 10% adicional" {
+    const duende = new Duende(poderMagico = 20, astucia = 5, rol = hechicero)
+    assert.equals(220, duende.poderOfensivo())
+  }
+}
+
+
+// Saber si un Hada es formidable
+
+
+describe "Hada formidable" {
+
+  test "un hada es formidable si es astuta (astucia mayor a 50)" {
+    const hada = new Hada(poderMagico = 5, astucia = 60, rol = domador)
+    assert.that(hada.esFormidable())
+  }
+
+  test "un hada es formidable si su rol es extraordinario y vuela mas de 10km" {
+    const hada = new Hada(poderMagico = 5, astucia = 10, rol = hechicero)
+    hada.aumentarVuelo(15)
+    assert.that(hada.esFormidable())
+  }
+
+  test "un hada no es formidable si no es astuta y su rol extraordinario no se cumple con el vuelo" {
+    const hada = new Hada(poderMagico = 5, astucia = 10, rol = hechicero)
+    assert.notThat(hada.esFormidable())
+  }
+
+  test "un hada no es formidable si no es astuta y su rol no es extraordinario" {
+    const hada = new Hada(poderMagico = 5, astucia = 10, rol = guardian)
+    hada.aumentarVuelo(15)
+    assert.notThat(hada.esFormidable())
+  }
+}

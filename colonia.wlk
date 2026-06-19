@@ -1,4 +1,4 @@
-
+import criaturas.*
 class Colonia {
   const criaturas = []
 

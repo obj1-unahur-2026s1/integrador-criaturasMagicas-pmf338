@@ -1,3 +1,4 @@
+import criaturas.*
 class Claro {
   var colonia
 
