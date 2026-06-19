@@ -1,7 +1,7 @@
 import roles.*
 class Criatura {
   var poderMagico
-  var astucia
+  const astucia
   var rol
   const mascotas = []
 
@@ -23,20 +23,17 @@ class Criatura {
 
   method agregarMascota(mascota) {mascotas.add(mascota)}
 
-  method cambiarRol(nuevoRol)
+  // El ritual se delega completamente al rol actual, es el rol quien sabe
+  // a que otro rol puede transformar a la criatura.
+  method cambiarRol(mascotaNueva) {rol.realizarRitual(self, mascotaNueva)}
 
-  method cambiarRolADomadorConMascota(mascotaNueva) {
+  method convertirseEnGuardian() {rol = guardian}
+
+  method convertirseEnHechicero() {rol = hechicero}
+
+  method convertirseEnDomadorCon(mascotaNueva) {
     rol = domador
     mascotas.add(mascotaNueva)
-  }
-
-  method cambiarRolAGuardian() {rol = guardian}
-
-  method cambiarRolAHechicero() {
-    if (!mascotas.any({m => m.tieneCuernos()})) {
-      error.throwWithMessage("El ritual fue cancelado: no hay mascota con cuernos")
-    }
-    rol = hechicero
   }
 }
 
@@ -44,19 +41,6 @@ class Duende inherits Criatura {
   override method poderOfensivo() = self.poderOfensivoBase() * 1.1
 
   override method esAstuta() = false
-
-  override method cambiarRol(nuevoRol) {
-    if (rol == guardian) {
-      error.throwWithMessage("Desde guardián solo se puede pasar a domador con una mascota nueva")
-    }
-    if (rol == hechicero) {
-      self.cambiarRolAGuardian()
-      
-    }
-    if (rol == domador) {
-      self.cambiarRolAHechicero()
-    }
-  }
 }
 
 class Hada inherits Criatura {
@@ -71,27 +55,14 @@ class Hada inherits Criatura {
   override method esAstuta() = astucia > 50
 
   override method esExtraordinaria() = super() && kilometrosDeVuelo > 10
-
-  override method cambiarRol(nuevoRol) {
-    if (rol == guardian) {
-      error.throwWithMessage("Desde guardián solo se puede pasar a domador con una mascota nueva")
-    }
-    if (rol == hechicero) {
-      self.cambiarRolAGuardian()
-      
-    }
-    if (rol == domador) {
-      self.cambiarRolAHechicero()
-    }
-  }
 }
 
 class MascotaMitologica {
-  var edad
-  var tieneCuernos
+  const edad
+  const tieneCuernos
 
   method edad() = edad
   method tieneCuernos() = tieneCuernos
 
-  method esVeterana() = edad >= 10
+  method esVeterana() {edad >= 10}
 }
